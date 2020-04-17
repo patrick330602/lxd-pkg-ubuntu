@@ -23,8 +23,14 @@ case "$1" in
         COUNT=0
         SKIP=false
         while :; do
-            if [ -f /proc/sys/fs/binfmt_misc/WSLInterop ]; then
-                echo "===> WSL detected; Skipping migration"
+            if [ ! -e "/run/snapd.socket" ] && [ ! -e "/var/lib/lxd/server.crt" ] \ 
+                || [ ! -e "/run/snapd.socket" ] \
+                && [ ! "$(ls -A /var/lib/lxd/containers)" ] \
+                && [ ! "$(ls -A /var/lib/lxd/images)" ] \
+                && [ ! "$(ls -A /var/lib/lxd/networks)" ] \
+                && [ ! "$(ls -A /var/lib/lxd/storage-pools)" ]
+            then
+                echo "===> System doesn't have working snapd and LXD was never used, skipping"
                 SKIP=true
                 break
             fi
