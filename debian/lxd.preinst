@@ -25,10 +25,10 @@ case "$1" in
         while :; do
             if ( [ ! -e "/run/snapd.socket" ] && [ ! -e "/var/lib/lxd/server.crt" ] ) \
                 || ( [ ! -e "/run/snapd.socket" ] \
-                && [ -z "$(ls -A /var/lib/lxd/containers)" ] \
-                && [ -z "$(ls -A /var/lib/lxd/images)" ] \
-                && [ -z "$(ls -A /var/lib/lxd/networks)" ] \
-                && [ -z "$(ls -A /var/lib/lxd/storage-pools)" ] )
+                && [ -z "$(ls -A /var/lib/lxd/containers >/dev/null 2>&1)" ] \
+                && [ -z "$(ls -A /var/lib/lxd/images >/dev/null 2>&1)" ] \
+                && [ -z "$(ls -A /var/lib/lxd/networks >/dev/null 2>&1)" ] \
+                && [ -z "$(ls -A /var/lib/lxd/storage-pools >/dev/null 2>&1)" ] )
             then
                 echo "===> System doesn't have working snapd and LXD was never used, skipping"
                 SKIP=true
