@@ -4,12 +4,41 @@ set -e
 function snapd_lxd_checker {
     if [ ! -e "/run/snapd.socket" ] && [ ! -e "/var/lib/lxd/server.crt" ]; then
         return 0
-    elif ( [ ! -e "/run/snapd.socket" ] \
-    && [ -z "$(ls -A /var/lib/lxd/containers >/dev/null 2>&1)" ] \
-    && [ -z "$(ls -A /var/lib/lxd/images >/dev/null 2>&1)" ] \
-    && [ -z "$(ls -A /var/lib/lxd/networks >/dev/null 2>&1)" ] \
-    && [ -z "$(ls -A /var/lib/lxd/storage-pools >/dev/null 2>&1)" ] ); then
-        return 0
+    elif [ ! -e "/run/snapd.socket" ]; then
+        CHECKERCOUNT=0
+        if [ -d "/var/lib/lxd/containers" ] ; then 
+            if [ -z "$(ls -A /var/lib/lxd/containers)" ]; then
+                CHECKERCOUNT=$((CHECKERCOUNT+1))
+            fi
+        else
+            CHECKERCOUNT=$((CHECKERCOUNT+1))
+        fi
+        if [ -d "/var/lib/lxd/images" ] ; then 
+            if [ -z "$(ls -A /var/lib/lxd/images)" ]; then
+                CHECKERCOUNT=$((CHECKERCOUNT+1))
+            fi
+        else
+            CHECKERCOUNT=$((CHECKERCOUNT+1))
+        fi
+        if [ -d "/var/lib/lxd/networks" ] ; then 
+            if [ -z "$(ls -A /var/lib/lxd/networks)" ]; then
+                CHECKERCOUNT=$((CHECKERCOUNT+1))
+            fi
+        else
+            CHECKERCOUNT=$((CHECKERCOUNT+1))
+        fi
+        if [ -d "/var/lib/lxd/storage-pools" ] ; then 
+            if [ -z "$(ls -A /var/lib/lxd/storage-pools)" ]; then
+                CHECKERCOUNT=$((CHECKERCOUNT+1))
+            fi
+        else
+            CHECKERCOUNT=$((CHECKERCOUNT+1))
+        fi
+        if [ "$CHECKERCOUNT" -eq 4 ]; then
+            return 0
+        else
+            return 1
+        fi
     else
         return 1
     fi
