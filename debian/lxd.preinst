@@ -23,12 +23,12 @@ case "$1" in
         COUNT=0
         SKIP=false
         while :; do
-            if [ ! -e "/run/snapd.socket" ] && [ ! -e "/var/lib/lxd/server.crt" ] \ 
-                || [ ! -e "/run/snapd.socket" ] \
-                && [ ! "$(ls -A /var/lib/lxd/containers)" ] \
-                && [ ! "$(ls -A /var/lib/lxd/images)" ] \
-                && [ ! "$(ls -A /var/lib/lxd/networks)" ] \
-                && [ ! "$(ls -A /var/lib/lxd/storage-pools)" ]
+            if ( [ ! -e "/run/snapd.socket" ] && [ ! -e "/var/lib/lxd/server.crt" ] ) \
+                || ( [ ! -e "/run/snapd.socket" ] \
+                && [ -z "$(ls -A /var/lib/lxd/containers)" ] \
+                && [ -z "$(ls -A /var/lib/lxd/images)" ] \
+                && [ -z "$(ls -A /var/lib/lxd/networks)" ] \
+                && [ -z "$(ls -A /var/lib/lxd/storage-pools)" ] )
             then
                 echo "===> System doesn't have working snapd and LXD was never used, skipping"
                 SKIP=true
