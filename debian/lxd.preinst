@@ -1,6 +1,20 @@
 #!/bin/sh
 set -e
 
+function snapd_lxd_checker {
+    if [ ! -e "/run/snapd.socket" ] && [ ! -e "/var/lib/lxd/server.crt" ]; then
+        return 0
+    elif ( [ ! -e "/run/snapd.socket" ] \
+    && [ -z "$(ls -A /var/lib/lxd/containers >/dev/null 2>&1)" ] \
+    && [ -z "$(ls -A /var/lib/lxd/images >/dev/null 2>&1)" ] \
+    && [ -z "$(ls -A /var/lib/lxd/networks >/dev/null 2>&1)" ] \
+    && [ -z "$(ls -A /var/lib/lxd/storage-pools >/dev/null 2>&1)" ] ); then
+        return 0
+    else
+        return 1
+    fi
+}
+
 case "$1" in
     install|upgrade)
         . /usr/share/debconf/confmodule
@@ -23,13 +37,7 @@ case "$1" in
         COUNT=0
         SKIP=false
         while :; do
-            if ( [ ! -e "/run/snapd.socket" ] && [ ! -e "/var/lib/lxd/server.crt" ] ) \
-                || ( [ ! -e "/run/snapd.socket" ] \
-                && [ -z "$(ls -A /var/lib/lxd/containers >/dev/null 2>&1)" ] \
-                && [ -z "$(ls -A /var/lib/lxd/images >/dev/null 2>&1)" ] \
-                && [ -z "$(ls -A /var/lib/lxd/networks >/dev/null 2>&1)" ] \
-                && [ -z "$(ls -A /var/lib/lxd/storage-pools >/dev/null 2>&1)" ] )
-            then
+            if snapd_lxd_checker ; then
                 echo "===> System doesn't have working snapd and LXD was never used, skipping"
                 SKIP=true
                 break
