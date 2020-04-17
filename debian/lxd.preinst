@@ -23,6 +23,12 @@ case "$1" in
         COUNT=0
         SKIP=false
         while :; do
+            if [ -f /proc/sys/fs/binfmt_misc/WSLInterop ]; then
+                echo "===> WSL detected; Skipping migration"
+                SKIP=true
+                break
+            fi
+
             snap info lxd >/dev/null 2>&1 && break
 
             db_fset lxd/snap-no-connectivity seen false
